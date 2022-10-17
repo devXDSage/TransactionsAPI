@@ -5,18 +5,26 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using TransactionAPIApplication.Data;
 using TransactionAPIApplication.Controllers;
+using System;
 
 // integrate logger again
+
+//update.create tranaction model
+//make a request class to abstract transactions
+//create transacion request
+//create transation resposne model which will be needed to respond the model
+//class for passing around (can have a third layer which copies the values)
+
 namespace TransactionAPIApplication.Models
 {
     public interface ITransactionRepository
     {
         Task<IEnumerable<TransactionModel>> GetAll();
-        Task <TransactionModel> Get(int id);
+        Task <TransactionModel> Get(string id);
         Task<TransactionModel> Create(TransactionModel transaction);
 
-        Task<TransactionModel> Update(int id, TransactionModel transaction);
-        Task<TransactionModel> Delete(int id);
+        Task<TransactionModel> Update(string id, TransactionModel transaction);
+        Task<TransactionModel> Delete(string id);
     }
     public class TransactionRepository : ITransactionRepository
     {
@@ -32,13 +40,18 @@ namespace TransactionAPIApplication.Models
         
         public async Task<TransactionModel> Create(TransactionModel transaction)
         {
+            Guid g = Guid.NewGuid();
+            transaction.Id = g.ToString();
+           
+
+
             _appDBContext.Transactions.Add(transaction);
             await _appDBContext.SaveChangesAsync();
             _logger.LogInformation("Record created");
             return transaction;
         }
 
-        public async Task<TransactionModel> Update(int id, TransactionModel transaction)
+        public async Task<TransactionModel> Update(string id, TransactionModel transaction)
         {
             TransactionModel? dbRecord = await _appDBContext.Transactions.FirstOrDefaultAsync(x => x.Id == id);
 
@@ -54,7 +67,7 @@ namespace TransactionAPIApplication.Models
             return dbRecord;
         }
 
-        public async Task <TransactionModel> Delete(int id)
+        public async Task <TransactionModel> Delete(string id)
         {
             TransactionModel? dbRecord = await _appDBContext.Transactions.FirstOrDefaultAsync(x => x.Id == id);
 
@@ -69,7 +82,7 @@ namespace TransactionAPIApplication.Models
             return dbRecord;
         }
 
-        public async Task<TransactionModel> Get(int id)
+        public async Task<TransactionModel> Get(string id)
         {
             TransactionModel? dbRecord = await _appDBContext.Transactions.FirstOrDefaultAsync(x => x.Id == id);
             return dbRecord;

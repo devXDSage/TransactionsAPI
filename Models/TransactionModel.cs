@@ -7,7 +7,7 @@ namespace TransactionAPIApplication.Models
     public class TransactionModel
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [Required]
         public string Type { get; set; } = string.Empty;

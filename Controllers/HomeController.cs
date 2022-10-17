@@ -24,22 +24,32 @@ namespace TransactionAPIApplication.Controllers
             _transactionRepository = transactionRepository;
             _logger = logger;
         }
-
+         
         [HttpGet]
         public async Task<IActionResult> Get()
         {
             _logger.LogInformation("GET api/Transactions called");
-            var transaction = new TransactionModel();
-            var re = await _transactionRepository.GetAll();
-            _logger.LogInformation("Users retreived");
-           // retrieved re
-            return Ok(re);
+            var transaction = new TransactionModel();         
+            try
+            {
+                var re = await _transactionRepository.GetAll();
+                _logger.LogInformation("Users retreived");
+                // retrieved re
+                return Ok(re);
+            }
+
+            catch (Exception ex) // how to test try catch blocks?
+            {
+                _logger.LogError(ex, "Exception while retreiving users");
+                throw;
+            }
         }
 
+        //[HttpGet]
         [HttpGet ("{id:int}")]
-        public async Task<IActionResult> GetID([FromRoute] int id)
+        public async Task<IActionResult> GetID([FromRoute] string id)
         {
-            _logger.LogInformation("GET api/Transactions called with ID {id}", id);
+            
             var transaction = new TransactionModel();
             var re = await _transactionRepository.Get(id);
             if (re == null)
@@ -47,25 +57,35 @@ namespace TransactionAPIApplication.Controllers
                 _logger.LogInformation("No user found with the id: {id}" , id);
                 return NotFound();
             }
-            
-            _logger.LogInformation("Users retreived");
-            // retrieved re
+            _logger.LogInformation("GET api/Transactions called with ID {id}", id);
             return Ok(re);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] TransactionModel tr) // tag: From body
+        public async Task<IActionResult> Post([FromRoute] string id,[FromBody] TransactionModel tr) // tag: From body
         {
             _logger.LogInformation("POST api/Transactions called", tr);
-            await _transactionRepository.Create(tr);
-            return Ok(new
+            try
             {
-                Message = "Created"
-            });;
+                await _transactionRepository.Create(tr);
+                return Ok(new
+                {
+                    Message = "Created"
+                }); ;
+            }
+
+            catch (Exception ex) // how to test try catch blocks?
+            {
+                _logger.LogError(ex, "Exception while POSTing users");
+                throw;
+            }
+
+           
+           
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] TransactionModel tr)
+        public async Task<IActionResult> Put([FromRoute] string id, [FromBody] TransactionModel tr)
         {
             _logger.LogInformation("PUT api/Transactions called. {id} =  , {data} =  ", id, tr );
             var result = await _transactionRepository.Update(id, tr);
@@ -80,14 +100,24 @@ namespace TransactionAPIApplication.Controllers
         [HttpDelete("{id}")]
         /// use from route 
         // use repo class update method
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
             _logger.LogInformation("DELETE api/Transactions called with id: {id} ", id);
-            await _transactionRepository.Delete(id);
-            return Ok(new
+
+            try
             {
-                Message = "Deleted"
-            }) ;
+                await _transactionRepository.Delete(id);
+                return Ok(new
+                {
+                    Message = "Deleted"
+                }); 
+            }
+
+            catch (Exception ex) // how to test try catch blocks?
+            {
+                _logger.LogError(ex, "Exception while DELETing users");
+                throw;
+            }
 
         }
 
