@@ -1,15 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using TransactionAPIApplication.Data;
-using TransactionAPIApplication.Controllers;
 using System;
 using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2.DocumentModel;
-using Amazon.S3.Model;
-using Microsoft.Extensions.FileSystemGlobbing;
 
 // integrate logger again
 

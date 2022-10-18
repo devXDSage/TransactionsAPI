@@ -1,27 +1,21 @@
-﻿using Amazon.DynamoDBv2.DataModel;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Transactions;
 using TransactionAPIApplication.Models;
 
 namespace TransactionAPIApplication.Controllers
 {
     [Route("api/Transactions")]
     [ApiController]
-    public class HomeController : Controller
+    public class TransactionsController : Controller
     {
         private readonly ITransactionRepository _transactionRepository;
-        private readonly ILogger<HomeController> _logger; // dependecy injection + IOC
+        private readonly ILogger<TransactionsController> _logger; // dependecy injection + IOC
         
 
 
-        public HomeController(ITransactionRepository transactionRepository, ILogger<HomeController> logger)
+        public TransactionsController(ITransactionRepository transactionRepository, ILogger<TransactionsController> logger)
         {
             _transactionRepository = transactionRepository;
             _logger = logger;

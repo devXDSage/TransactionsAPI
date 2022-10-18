@@ -1,7 +1,6 @@
 ﻿
 
 using Microsoft.EntityFrameworkCore;
-using System.Transactions;
 using TransactionAPIApplication.Models;
 
 namespace TransactionAPIApplication.Data
