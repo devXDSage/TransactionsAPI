@@ -1,3 +1,8 @@
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Runtime.SharedInterfaces;
+using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -56,6 +61,15 @@ namespace TransactionAPIApplication
             //services.AddDbContext<AppDBContext>(options => options.UseSqlServer(
             //            connectionstring
             //    ));
+
+            AWSOptions awsOptions = Configuration.GetAWSOptions();
+            services.AddDefaultAWSOptions(awsOptions);
+            services.AddAWSService<IAmazonS3>(awsOptions);
+
+            services.AddAWSService<IAmazonDynamoDB>();
+            services.AddScoped<IDynamoDBContext, DynamoDBContext>();
+
+
             services.AddDbContext<AppDBContext>(o => o.UseSqlite("Data source=transactions.db"));
 
             services.AddScoped<ITransactionRepository, TransactionRepository>();

@@ -1,18 +1,20 @@
-﻿using System;
+﻿using Amazon.DynamoDBv2.DataModel;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Intrinsics.X86;
 
 namespace TransactionAPIApplication.Models
 {
+    [DynamoDBTable("Orders")]
     public class TransactionModel
     {
-        [Key]
+        [DynamoDBHashKey("GID")]
         public string Id { get; set; }
 
-        [Required]
+        [DynamoDBProperty("Type")]
         public string Type { get; set; } = string.Empty;
 
-        [Required]
+        [DynamoDBProperty("Amount")]
         public int Amount { get; set; }
 
         public DateTime CreatedDateTime { get; set; } = DateTime.Now; 

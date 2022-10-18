@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Amazon.DynamoDBv2.DataModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,19 +18,25 @@ namespace TransactionAPIApplication.Controllers
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly ILogger<HomeController> _logger; // dependecy injection + IOC
+        
 
 
         public HomeController(ITransactionRepository transactionRepository, ILogger<HomeController> logger)
         {
             _transactionRepository = transactionRepository;
             _logger = logger;
+            
+
         }
          
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+
+            //var product = await _dynamoDBContext.LoadAsync<Product>(category, productName);
+            //return Ok(product);
             _logger.LogInformation("GET api/Transactions called");
-            var transaction = new TransactionModel();         
+            var transaction = new TransactionModel();
             try
             {
                 var re = await _transactionRepository.GetAll();
