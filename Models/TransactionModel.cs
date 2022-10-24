@@ -10,12 +10,12 @@ namespace TransactionAPIApplication.Models
         public string Id { get; set; }
 
         [DynamoDBProperty("Type")]
-        public string Type { get; set; } = string.Empty;
+        public string Type { get; set; }
 
         [DynamoDBProperty("Amount")]
-        public int Amount { get; set; }
-
-        public DateTime CreatedDateTime { get; set; } = DateTime.Now; 
+        public double Amount { get; set; }
+        
+        public DateTime CreatedDateTime { get; set; } 
 
 
     }

@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using TransactionAPIApplication.Data;
 using TransactionAPIApplication.Models;
 
@@ -61,6 +63,8 @@ namespace TransactionAPIApplication
             //            connectionstring
             //    ));
 
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             AWSOptions awsOptions = Configuration.GetAWSOptions();
             services.AddDefaultAWSOptions(awsOptions);
             services.AddAWSService<IAmazonS3>(awsOptions);
@@ -82,12 +86,20 @@ namespace TransactionAPIApplication
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();  // middleware
             }
+
+           
+            
             else
             {
                 app.UseHsts();
             }
+
+            //app.Run(async (context) =>             // middleware
+            //{
+            //    await context.Response.WriteAsync(System.Diagnostics.Process.GetCurrentProcess().ProcessName);
+            //});
 
             app.UseHttpsRedirection();
 

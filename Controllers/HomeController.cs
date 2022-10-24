@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections;
 using System.Threading.Tasks;
+using TransactionAPIApplication.DataContracts;
 using TransactionAPIApplication.Models;
 
 namespace TransactionAPIApplication.Controllers
@@ -11,15 +14,14 @@ namespace TransactionAPIApplication.Controllers
     public class TransactionsController : Controller
     {
         private readonly ITransactionRepository _transactionRepository;
-        private readonly ILogger<TransactionsController> _logger; // dependecy injection + IOC
+        private readonly ILogger<TransactionsController> _logger;
+        private readonly IMapper _mapper;   // dependecy injection + IOC
         
-
-
-        public TransactionsController(ITransactionRepository transactionRepository, ILogger<TransactionsController> logger)
+        public TransactionsController(ITransactionRepository transactionRepository, ILogger<TransactionsController> logger, IMapper mapper)
         {
             _transactionRepository = transactionRepository;
             _logger = logger;
-            
+            _mapper = mapper;
 
         }
          
@@ -33,10 +35,9 @@ namespace TransactionAPIApplication.Controllers
             var transaction = new TransactionModel();
             try
             {
-                var re = await _transactionRepository.GetAll();
-                _logger.LogInformation("Users retreived");
+                
                 // retrieved re
-                return Ok(re);
+                return Ok();
             }
 
             catch (Exception ex) // how to test try catch blocks?
@@ -52,6 +53,7 @@ namespace TransactionAPIApplication.Controllers
         {
             
             var transaction = new TransactionModel();
+
             var re = await _transactionRepository.Get(id);
             if (re == null)
             {
@@ -63,16 +65,22 @@ namespace TransactionAPIApplication.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromRoute] string id,[FromBody] TransactionModel tr) // tag: From body
+        public async Task<IActionResult> Post([FromBody] CreateTransactionRequest createTransactionRequest) // tag: From body
         {
-            _logger.LogInformation("POST api/Transactions called", tr);
+            _logger.LogInformation("POST api/Transactions called", createTransactionRequest);
             try
             {
-                await _transactionRepository.Create(tr);
-                return Ok(new
+                if(!ModelState.IsValid)
                 {
-                    Message = "Created"
-                }); ;
+                    return BadRequest(ModelState);
+                }
+                TransactionModel transaction = _mapper.Map<TransactionModel>(createTransactionRequest);
+               
+                var tran = await _transactionRepository.Create(transaction);
+                
+                TransactionResponse response = _mapper.Map<TransactionResponse>(tran);
+
+                return Ok(response);
             }
 
             catch (Exception ex) // how to test try catch blocks?

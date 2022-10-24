@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 using TransactionAPIApplication.Data;
 using System;
 using Amazon.DynamoDBv2.DataModel;
+using AutoMapper;
+
+
+// add ModelState 
+
 
 // integrate logger again
 
@@ -18,7 +23,7 @@ namespace TransactionAPIApplication.Models
 {
     public interface ITransactionRepository
     {
-        Task<IEnumerable<TransactionModel>> GetAll();
+        
         Task <TransactionModel> Get(string id);
         Task<TransactionModel> Create(TransactionModel transaction);
 
@@ -30,12 +35,14 @@ namespace TransactionAPIApplication.Models
         private readonly AppDBContext _appDBContext;
         private readonly IDynamoDBContext _dynamoDBContext;
         private readonly ILogger<TransactionRepository> _logger;
+        private readonly IMapper _mapper;
 
-        public TransactionRepository(AppDBContext appDBContext, ILogger<TransactionRepository> logger, IDynamoDBContext dynamoDBContext)
+        public TransactionRepository(AppDBContext appDBContext, ILogger<TransactionRepository> logger, IDynamoDBContext dynamoDBContext, IMapper mapper)
         {
             _appDBContext = appDBContext;
             _logger = logger;
             _dynamoDBContext = dynamoDBContext;
+            _mapper = mapper;
         }
     
         public async Task<TransactionModel> Create(TransactionModel transaction)
@@ -53,7 +60,7 @@ namespace TransactionAPIApplication.Models
 
         public async Task<TransactionModel> Update(string id, TransactionModel transaction)
         {
-            TransactionModel? dbRecord = await _appDBContext.Transactions.FirstOrDefaultAsync(x => x.Id == id);
+            TransactionModel? dbRecord = await _appDBContext.Transactions.FirstOrDefaultAsync(x => x.Id == id);  // LINQ
 
             if(dbRecord == null)
             {
@@ -84,24 +91,13 @@ namespace TransactionAPIApplication.Models
 
         public async Task<TransactionModel> Get(string id)
         {
-
+            //can use query -
             TransactionModel? dbRecord = await _dynamoDBContext.LoadAsync<TransactionModel>(id);
 
          //   TransactionModel? dbRecord = await _appDBContext.Transactions.FirstOrDefaultAsync(x => x.Id == id);
             return dbRecord;
         }
 
-        public async Task<IEnumerable<TransactionModel>> GetAll()
-        {
-           // _logger.LogInformation("All records requested");
-            
-           // var scanConditions = new List<ScanCondition>() { new ScanCondition("Id", ScanOperator.IsNotNull) };
-
-
-           //var result = await _dynamoDBContext.ScanAsync<Reader>(scanConditions);
-
-            throw new NotImplementedException();
-
-        }
+        
     }
 }
