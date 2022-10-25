@@ -6,12 +6,16 @@ using System.Collections;
 using System.Threading.Tasks;
 using TransactionAPIApplication.DataContracts;
 using TransactionAPIApplication.Models;
+using TransactionAPIApplication.Filters;
 
 namespace TransactionAPIApplication.Controllers
 {
     [Route("api/Transactions")]
-    [ApiController]
-    public class TransactionsController : Controller
+   
+    [ApiController]//   
+
+   
+    public class TransactionsController : ControllerBase
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly ILogger<TransactionsController> _logger;
@@ -63,8 +67,8 @@ namespace TransactionAPIApplication.Controllers
             _logger.LogInformation("GET api/Transactions called with ID {id}", id);
             return Ok(re);
         }
-
         [HttpPost]
+        
         public async Task<IActionResult> Post([FromBody] CreateTransactionRequest createTransactionRequest) // tag: From body
         {
             _logger.LogInformation("POST api/Transactions called", createTransactionRequest);
@@ -72,6 +76,7 @@ namespace TransactionAPIApplication.Controllers
             {
                 if(!ModelState.IsValid)
                 {
+                    _logger.LogError("ModelState validation failed");
                     return BadRequest(ModelState);
                 }
                 TransactionModel transaction = _mapper.Map<TransactionModel>(createTransactionRequest);

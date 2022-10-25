@@ -11,8 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using TransactionAPIApplication.Data;
+using TransactionAPIApplication.Filters;
 using TransactionAPIApplication.Models;
 
 namespace TransactionAPIApplication
@@ -42,6 +44,11 @@ namespace TransactionAPIApplication
                     });
             });
 
+            services.AddMvc(options =>
+            {
+                options.Filters.Add<ExampleFilter>();
+            });
+
             var domain = $"https://{Configuration["Auth0:Domain"]}/";
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -58,7 +65,28 @@ namespace TransactionAPIApplication
 
 
             string connectionstring = Configuration["ConnectionStrings:DefaultConnection"];
-            services.AddControllers();
+            services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            {
+                var builtInFactory = options.InvalidModelStateResponseFactory;
+                options.SuppressModelStateInvalidFilter = true;
+
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                   
+                    var logger = context.HttpContext.RequestServices
+                                        .GetRequiredService<ILogger<Program>>();
+
+                    logger.LogInformation("Automatic 400");
+                    // Perform logging here.
+                    // ...
+
+                    // Invoke the default behavior, which produces a ValidationProblemDetails
+                    // response.
+                    // To produce a custom response, return a different implementation of 
+                    // IActionResult instead.
+                    return builtInFactory(context);
+                };
+            });
             //services.AddDbContext<AppDBContext>(options => options.UseSqlServer(
             //            connectionstring
             //    ));
@@ -70,6 +98,7 @@ namespace TransactionAPIApplication
             services.AddAWSService<IAmazonS3>(awsOptions);
 
             services.AddAWSService<IAmazonDynamoDB>();
+            services.AddSingleton<ExampleFilter>();
             services.AddScoped<IDynamoDBContext, DynamoDBContext>();
 
 
