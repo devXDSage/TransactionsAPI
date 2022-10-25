@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\ApiController.cs" />
+    <Compile Remove="Data\AppDBContext.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.9" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 

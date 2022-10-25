@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TransactionAPIApplication.DataContracts;
 using TransactionAPIApplication.Models;
 using TransactionAPIApplication.Filters;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TransactionAPIApplication.Controllers
 {
@@ -28,8 +29,10 @@ namespace TransactionAPIApplication.Controllers
             _mapper = mapper;
 
         }
-         
+
+        
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
 
@@ -53,6 +56,7 @@ namespace TransactionAPIApplication.Controllers
 
         //[HttpGet]
         [HttpGet ("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> GetID([FromRoute] string id)
         {
             
@@ -68,7 +72,7 @@ namespace TransactionAPIApplication.Controllers
             return Ok(re);
         }
         [HttpPost]
-        
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] CreateTransactionRequest createTransactionRequest) // tag: From body
         {
             _logger.LogInformation("POST api/Transactions called", createTransactionRequest);
@@ -79,8 +83,7 @@ namespace TransactionAPIApplication.Controllers
                     _logger.LogError("ModelState validation failed");
                     return BadRequest(ModelState);
                 }
-                TransactionModel transaction = _mapper.Map<TransactionModel>(createTransactionRequest);
-               
+                TransactionModel transaction = _mapper.Map<TransactionModel>(createTransactionRequest);              
                 var tran = await _transactionRepository.Create(transaction);
                 
                 TransactionResponse response = _mapper.Map<TransactionResponse>(tran);
@@ -92,47 +95,23 @@ namespace TransactionAPIApplication.Controllers
             {
                 _logger.LogError(ex, "Exception while POSTing users");
                 throw;
-            }
-
-           
-           
+            }                   
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] string id, [FromBody] TransactionModel tr)
+        [Authorize]
+        public void Put([FromRoute] string id, [FromBody] TransactionModel tr)
         {
-            _logger.LogInformation("PUT api/Transactions called. {id} =  , {data} =  ", id, tr );
-            var result = await _transactionRepository.Update(id, tr);
-            if(result == null)
-            {
-                _logger.LogInformation("Users could not be updated with the id: {id}", id);
-                return NotFound();
-            }
-            return Ok(result);
+          
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         /// use from route 
         // use repo class update method
-        public async Task<IActionResult> Delete([FromRoute] string id)
+        public void Delete([FromRoute] string id)
         {
-            _logger.LogInformation("DELETE api/Transactions called with id: {id} ", id);
-
-            try
-            {
-                await _transactionRepository.Delete(id);
-                return Ok(new
-                {
-                    Message = "Deleted"
-                }); 
-            }
-
-            catch (Exception ex) // how to test try catch blocks?
-            {
-                _logger.LogError(ex, "Exception while DELETing users");
-                throw;
-            }
-
+           
         }
 
        

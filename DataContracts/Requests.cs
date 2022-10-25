@@ -13,6 +13,8 @@ namespace TransactionAPIApplication.DataContracts
         [DisplayName("Amount")]
         [RegularExpression(@"[0-9]+(\.([0-9]{4,}|000|00|0))?", ErrorMessage ="Non negative number")] // regex for non-negative numbers and OPTIONAL decimal
         public int Amount { get; set; }
+
+        // Gross Amount
     }
 
     public class TransactionResponse

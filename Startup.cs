@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using TransactionAPIApplication.Data;
 using TransactionAPIApplication.Filters;
 using TransactionAPIApplication.Models;
 
@@ -68,7 +68,7 @@ namespace TransactionAPIApplication
             services.AddControllers().ConfigureApiBehaviorOptions(options =>
             {
                 var builtInFactory = options.InvalidModelStateResponseFactory;
-                options.SuppressModelStateInvalidFilter = true;
+             //  options.SuppressModelStateInvalidFilter = true;
 
                 options.InvalidModelStateResponseFactory = context =>
                 {
@@ -77,13 +77,14 @@ namespace TransactionAPIApplication
                                         .GetRequiredService<ILogger<Program>>();
 
                     logger.LogInformation("Automatic 400");
-                    // Perform logging here.
-                    // ...
 
-                    // Invoke the default behavior, which produces a ValidationProblemDetails
-                    // response.
-                    // To produce a custom response, return a different implementation of 
-                    // IActionResult instead.
+                    foreach (var modelState in context.ModelState)
+                    {
+                       foreach (var error in modelState.Value.Errors)
+                        {
+                            logger.LogInformation(error.ErrorMessage.ToString());
+                        }
+                    }
                     return builtInFactory(context);
                 };
             });
@@ -100,12 +101,7 @@ namespace TransactionAPIApplication
             services.AddAWSService<IAmazonDynamoDB>();
             services.AddSingleton<ExampleFilter>();
             services.AddScoped<IDynamoDBContext, DynamoDBContext>();
-
-
-            services.AddDbContext<AppDBContext>(o => o.UseSqlite("Data source=transactions.db"));
-
             services.AddScoped<ITransactionRepository, TransactionRepository>();
-
             // Register the scope authorization handler
             services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
         }
@@ -116,10 +112,7 @@ namespace TransactionAPIApplication
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();  // middleware
-            }
-
-           
-            
+            }                      
             else
             {
                 app.UseHsts();
